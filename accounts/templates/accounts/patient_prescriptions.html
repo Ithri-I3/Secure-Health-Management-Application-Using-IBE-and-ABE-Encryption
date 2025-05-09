@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Mes Ordonnances</h2>
+
+{% if prescriptions %}
+    <ul>
+        {% for prescription in prescriptions %}
+            <li>
+                <p><strong>Émise le :</strong> {{ prescription.issue_date }}</p>
+                <p><strong>Validité :</strong> {{ prescription.validity_days }} jours</p>
+                <p><strong>Médecin :</strong> {{ prescription.consultation.professional.get_full_name }}</p>
+                <p><strong>Politique ABE :</strong> {{ prescription.abe_policy }} </p>
+                <p><strong>Contenu :</strong></p>
+                {% if prescription.decrypted_content %}
+                    <p>{{ prescription.decrypted_content }}</p>
+                {% else %}
+                    <p class="text-danger">Impossible de déchiffrer cette ordonnance.</p>
+                {% endif %}
+                <hr>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune ordonnance trouvée.</p>
+{% endif %}
+
+{% endblock %}

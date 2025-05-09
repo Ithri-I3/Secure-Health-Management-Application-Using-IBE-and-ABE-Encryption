@@ -1,0 +1,69 @@
+/* Styles personnalisés pour l'application */
+
+/* Variables pour le thème clair (par défaut) */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --body-bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --font-size-base: 1rem;
+    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+/* Variables pour le thème sombre */
+[data-theme="dark"] {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #343a40;
+    --dark-color: #f8f9fa;
+    --body-bg: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e9ecef;
+    --border-color: #495057;
+    --input-bg: #2c2c2c;
+    --input-border: #495057;
+    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .5);
+}
+
+/* Application des variables */
+body {
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Taille de police */
+body.font-small {
+    --font-size-base: 0.875rem;
+}
+
+body.font-medium {
+    --font-size-base: 1rem;
+}
+
+body.font-large {
+    --font-size-base: 1.125rem;
+}
+
+/* Styles de base */
+body {
+    font-size: var(--font-size-base);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Remplir les résultats d'analyse</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Informations sur l'analyse</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Patient:</strong> {{ object.patient.user.get_full_name }}</p>
+            <p><strong>Type d'analyse:</strong> {{ object.get_test_type_display }}</p>
+            <p><strong>Description:</strong> {{ object.description }}</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Résultats</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="alert alert-info">
+                    <p><i class="fas fa-info-circle"></i> Les résultats seront chiffrés avec ABE en utilisant une politique de contrôle d'accès.</p>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_results" class="form-label">{{ form.results.label }}</label>
+                    {{ form.results }}
+                    {% if form.results.help_text %}
+                        <div class="form-text">{{ form.results.help_text }}</div>
+                    {% endif %}
+                    {% if form.results.errors %}
+                        <div class="invalid-feedback d-block">{{ form.results.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_status" class="form-label">{{ form.status.label }}</label>
+                    {{ form.status }}
+                    {% if form.status.help_text %}
+                        <div class="form-text">{{ form.status.help_text }}</div>
+                    {% endif %}
+                    {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">{{ form.status.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_abe_policy" class="form-label">{{ form.abe_policy.label }}</label>
+                    {{ form.abe_policy }}
+                    {% if form.abe_policy.help_text %}
+                        <div class="form-text">{{ form.abe_policy.help_text }}</div>
+                    {% endif %}
+                    {% if form.abe_policy.errors %}
+                        <div class="invalid-feedback d-block">{{ form.abe_policy.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Enregistrer les résultats</button>
+                    <a href="{% url 'labtest_detail' object.id %}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

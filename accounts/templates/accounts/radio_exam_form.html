@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if form.instance.pk %}
+        <h2>Modifier l'examen radiologique</h2>
+    {% else %}
+        <h2>Nouvel examen radiologique</h2>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Affichage des erreurs -->
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Des erreurs ont été trouvées dans le formulaire:</strong>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                <!-- Sélection du patient -->
+                <div class="mb-3">
+                    <label for="{{ form.patient.id_for_label }}" class="form-label">Patient</label>
+                    {{ form.patient }}
+                    <div class="invalid-feedback">{{ form.patient.errors }}</div>
+                </div>
+                
+                <!-- Notes de l'examen -->
+                <div class="mb-3">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Résultats et observations</label>
+                    {{ form.notes }}
+                    <div class="invalid-feedback">{{ form.notes.errors }}</div>
+                    <small class="form-text text-muted">Décrivez les résultats de l'examen radiologique, vos observations et recommandations.</small>
+                </div>
+                
+                <!-- Politique ABE (pour le chiffrement) -->
+                <div class="mb-3">
+                    <label for="{{ form.abe_policy.id_for_label }}" class="form-label">Politique d'accès (ABE)</label>
+                    {{ form.abe_policy }}
+                    <div class="invalid-feedback">{{ form.abe_policy.errors }}</div>
+                    <small class="form-text text-muted">Définissez qui peut accéder à ces informations. Laissez vide pour utiliser la politique par défaut.</small>
+                </div>
+                
+                <!-- Suivi requis -->
+                <div class="mb-3 form-check">
+                    {{ form.follow_up_required }}
+                    <label class="form-check-label" for="{{ form.follow_up_required.id_for_label }}">Suivi nécessaire</label>
+                    <div class="invalid-feedback">{{ form.follow_up_required.errors }}</div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    {% if form.instance.pk %}
+                        <a href="{% url 'radio_exam_detail' form.instance.pk %}" class="btn btn-secondary">Annuler</a>
+                    {% else %}
+                        <a href="{% url 'radio_exam_list' %}" class="btn btn-secondary">Annuler</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script pour ajouter la validation Bootstrap
+    (function() {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}

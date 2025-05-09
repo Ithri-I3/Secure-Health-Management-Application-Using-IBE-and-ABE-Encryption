@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Demander une nouvelle analyse</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_test_type" class="form-label">Type d'analyse</label>
+                    <select name="test_type" id="id_test_type" class="form-select" required>
+                        {% for value, text in test_type_choices %}
+                            <option value="{{ value }}">{{ text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description / Raison de la demande</label>
+                    <textarea name="description" id="id_description" class="form-control" rows="4" required></textarea>
+                    <div class="form-text">Veuillez expliquer pourquoi vous demandez cette analyse.</div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'patient_labtest_list' %}" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Soumettre la demande</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

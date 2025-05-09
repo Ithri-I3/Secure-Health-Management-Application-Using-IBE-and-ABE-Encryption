@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails du patient - Radiologie</h2>
+    
+    <!-- Informations du patient -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informations personnelles</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nom:</strong> {{ patient.last_name }}</p>
+                    <p><strong>Prénom:</strong> {{ patient.first_name }}</p>
+                    <p><strong>Email:</strong> {{ patient.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if patient_profile %}
+                        <p><strong>Date de naissance:</strong> {{ patient_profile.date_of_birth|date:"d/m/Y" }}</p>
+                        <p><strong>Groupe sanguin:</strong> {{ patient_profile.blood_type }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dossiers médicaux -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Dossiers médicaux</h5>
+        </div>
+        <div class="card-body">
+            {% if medical_records %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date de création</th>
+                                <th>Créé par</th>
+                                <th>Dernière modification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in medical_records %}
+                                <tr>
+                                    <td>{{ record.creation_date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ record.creator.get_full_name }}</td>
+                                    <td>{{ record.last_modified|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucun dossier médical trouvé.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Consultations et examens radiologiques -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Consultations et examens</h5>
+            <a href="{% url 'radio_exam_create' %}?patient_id={{ patient.id }}" class="btn btn-light btn-sm">Nouvel examen radiologique</a>
+        </div>
+        <div class="card-body">
+            {% if consultations %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Professionnel</th>
+                                <th>Suivi requis</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consultation in consultations %}
+                                <tr>
+                                    <td>{{ consultation.date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ consultation.professional.get_full_name }}</td>
+                                    <td>
+                                        {% if consultation.follow_up_required %}
+                                            <span class="badge bg-warning">Oui</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Non</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'radio_exam_detail' consultation.id %}" class="btn btn-sm btn-info">Détails</a>
+                                        <a href="{% url 'radio_exam_update' consultation.id %}" class="btn btn-sm btn-primary">Modifier</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucune consultation ou examen trouvé.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Bouton de retour -->
+    <div class="mt-3">
+        <a href="{% url 'patient_list_radio' %}" class="btn btn-secondary">Retour à la liste des patients</a>
+    </div>
+</div>
+{% endblock %}

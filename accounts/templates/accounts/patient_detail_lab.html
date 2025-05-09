@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails du patient</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Informations personnelles</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nom:</strong> {{ patient.last_name }}</p>
+                    <p><strong>Prénom:</strong> {{ patient.first_name }}</p>
+                    <p><strong>Email:</strong> {{ patient.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if patient.patient_profile %}
+                        <p><strong>Date de naissance:</strong> {{ patient.patient_profile.date_of_birth|date:"d/m/Y" }}</p>
+                        <p><strong>Groupe sanguin:</strong> {{ patient.patient_profile.blood_type }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Analyses de laboratoire</h5>
+        </div>
+        <div class="card-body">
+            {% if lab_tests %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Type d'analyse</th>
+                                <th>Date de demande</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in lab_tests %}
+                                <tr>
+                                    <td>{{ test.get_test_type_display }}</td>
+                                    <td>{{ test.request_date|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                            {{ test.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'labtest_detail' test.id %}" class="btn btn-sm btn-info">Détails</a>
+                                        {% if test.status != 'COMPLETED' %}
+                                            <a href="{% url 'labtest_update' test.id %}" class="btn btn-sm btn-primary">Remplir résultats</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucune analyse trouvée pour ce patient.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'patient_list_lab' %}" class="btn btn-secondary">Retour à la liste des patients</a>
+    </div>
+</div>
+{% endblock %}

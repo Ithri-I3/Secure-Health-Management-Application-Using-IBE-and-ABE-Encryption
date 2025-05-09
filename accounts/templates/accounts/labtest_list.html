@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Liste des analyses de laboratoire</h2>
+    
+    <!-- Filtres et recherche -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="search_query" class="form-label">Rechercher un patient</label>
+                    <input type="text" class="form-control" id="search_query" name="search_query" value="{{ search_query }}" placeholder="Nom, prénom ou email">
+                </div>
+                <div class="col-md-5">
+                    <label for="status" class="form-label">Filtrer par statut</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="" {% if not status_filter %}selected{% endif %}>Tous les statuts</option>
+                        {% for status_code, status_name in status_choices %}
+                            <option value="{{ status_code }}" {% if status_filter == status_code %}selected{% endif %}>{{ status_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des analyses -->
+    <div class="card">
+        <div class="card-body">
+            {% if lab_tests %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Type d'analyse</th>
+                                <th>Date de demande</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in lab_tests %}
+                                <tr>
+                                    <td>{{ test.patient.user.get_full_name }}</td>
+                                    <td>{{ test.get_test_type_display }}</td>
+                                    <td>{{ test.request_date|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                            {{ test.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'labtest_detail' test.id %}" class="btn btn-sm btn-info">Détails</a>
+                                        {% if test.status != 'COMPLETED' %}
+                                            <a href="{% url 'labtest_update' test.id %}" class="btn btn-sm btn-primary">Remplir résultats</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucune analyse trouvée.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

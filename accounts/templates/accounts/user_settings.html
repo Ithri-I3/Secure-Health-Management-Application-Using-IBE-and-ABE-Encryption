@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Paramètres Utilisateur</h2>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Profil</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="appearance-tab" data-bs-toggle="tab" data-bs-target="#appearance" type="button" role="tab" aria-controls="appearance" aria-selected="false">Apparence</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">Sécurité</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">Notifications</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content mt-3" id="settingsTabsContent">
+                <!-- Onglet Profil -->
+                <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <form method="post" action="{% url 'update_profile' %}">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+                            <small class="form-text text-muted">L'email ne peut pas être modifié car il est utilisé pour l'authentification.</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                    </form>
+                </div>
+                
+                <!-- Onglet Apparence -->
+                <div class="tab-pane fade" id="appearance" role="tabpanel" aria-labelledby="appearance-tab">
+                    <div class="mb-4">
+                        <h5>Thème</h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                            <label class="form-check-label" for="darkModeToggle">Mode sombre</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Couleur principale</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn theme-color-btn" style="background-color: #0d6efd; width: 40px; height: 40px;" data-color="#0d6efd"></button>
+                            <button class="btn theme-color-btn" style="background-color: #198754; width: 40px; height: 40px;" data-color="#198754"></button>
+                            <button class="btn theme-color-btn" style="background-color: #dc3545; width: 40px; height: 40px;" data-color="#dc3545"></button>
+                            <button class="btn theme-color-btn" style="background-color: #fd7e14; width: 40px; height: 40px;" data-color="#fd7e14"></button>
+                            <button class="btn theme-color-btn" style="background-color: #6f42c1; width: 40px; height: 40px;" data-color="#6f42c1"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Taille de police</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="fontSize" id="fontSizeSmall" value="small">
+                            <label class="form-check-label" for="fontSizeSmall">Petite</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="fontSize" id="fontSizeMedium" value="medium" checked>
+                            <label class="form-check-label" for="fontSizeMedium">Moyenne</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="fontSize" id="fontSizeLarge" value="large">
+                            <label class="form-check-label" for="fontSizeLarge">Grande</label>
+                        </div>
+                    </div>
+                    
+                    <button id="saveAppearanceSettings" class="btn btn-primary">Enregistrer les préférences</button>
+                </div>
+                
+                <!-- Onglet Sécurité -->
+                <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                    <form method="post" action="{% url 'change_password' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Mot de passe actuel</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">Nouveau mot de passe</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        <div class="mb-

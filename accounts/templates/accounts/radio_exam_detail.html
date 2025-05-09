@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails de l'examen radiologique</h2>
+    
+    <!-- Informations de l'examen -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informations générales</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Patient:</strong> {{ radio_exam.patient.user.get_full_name }}</p>
+                    <p><strong>Date de l'examen:</strong> {{ radio_exam.date|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Professionnel:</strong> {{ radio_exam.professional.get_full_name }}</p>
+                    <p><strong>Suivi nécessaire:</strong> 
+                        {% if radio_exam.follow_up_required %}
+                            <span class="badge bg-warning">Oui</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Non</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Résultats et observations -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Résultats et observations</h5>
+        </div>
+        <div class="card-body">
+            {% if decryption_error %}
+                <div class="alert alert-danger">
+                    <strong>Erreur de déchiffrement:</strong> {{ decryption_error }}
+                </div>
+            {% elif decrypted_notes %}
+                <div class="p-3 bg-light rounded">
+                    <h6>Notes déchiffrées:</h6>
+                    <div class="mt-2">
+                        {{ decrypted_notes|linebreaks }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucune note disponible ou vous n'avez pas les droits pour les déchiffrer.</div>
+            {% endif %}
+            
+            <div class="mt-3">
+                <p><strong>Politique d'accès:</strong> <code>{{ radio_exam.abe_policy }}</code></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Boutons d'action -->
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'radio_exam_update' radio_exam.id %}" class="btn btn-primary">Modifier</a>
+        <a href="{% url 'patient_detail_radio' radio_exam.patient.user.id %}" class="btn btn-info">Voir le dossier patient</a>
+        <a href="{% url 'radio_exam_list' %}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
+{% endblock %}

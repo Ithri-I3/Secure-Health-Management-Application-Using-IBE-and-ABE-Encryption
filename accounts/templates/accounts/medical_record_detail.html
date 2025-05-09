@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Dossier Médical</h2>
+        </div>
+        <div class="card-body">
+            <h3>Informations générales</h3>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Patient :</strong> {{ record.patient.user.get_full_name|default:record.patient.user.email }}</p>
+                    <p><strong>Date de naissance :</strong> {{ record.patient.date_of_birth|date:"d/m/Y" }}</p>
+                    <p><strong>Groupe sanguin :</strong> {{ record.patient.blood_type }}</p>
+                    {% if insurance_number_decrypted %}
+                    <p><strong>Numéro d'assurance :</strong> {{ insurance_number_decrypted }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Créé par :</strong> {{ record.creator.get_full_name|default:record.creator.email }}</p>
+                    <p><strong>Date de création :</strong> {{ record.creation_date|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Dernière modification :</strong> {{ record.last_modified|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Politique ABE :</strong> {{ record.abe_policy }}</p>
+                </div>
+            </div>
+
+            <h3>Données médicales</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if decrypted_data %}
+                        <div class="medical-data">
+                            {{ decrypted_data|linebreaks }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            Vous n'avez pas les autorisations nécessaires pour déchiffrer ces données ou une erreur s'est produite lors du déchiffrement.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3>Professionnels assignés</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for professional in record.assigned_to.all %}
+                            <li class="list-group-item">
+                                {{ professional.get_full_name|default:professional.email }} ({{ professional.get_role_display }})
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Aucun professionnel assigné à ce dossier</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Consultations associées</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if consultations %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Professionnel</th>
+                                    <th>Suivi requis</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consultation in consultations %}
+                                <tr>
+                                    <td>{{ consultation.date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ consultation.professional.get_full_name|default:consultation.professional.email }}</td>
+                                    <td>{% if consultation.follow_up_required %}Oui{% else %}Non{% endif %}</td>
+                                    <td>
+                                        <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-primary">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Aucune consultation associée à ce dossier</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    {% if request.user.is_admin or request.user == record.creator %}
+                    <a href="{% url 'medical_record_update' record.id %}" class="btn btn-primary">Modifier</a>
+                    <a href="{% url 'medical_record_delete' record.id %}" class="btn btn-danger">Supprimer</a>
+                    {% endif %}
+                    {% if request.user.is_medecin or request.user.is_praticien %}
+                    <a href="{% url 'prescription_create' %}?patient_id={{ record.patient.id }}" class="btn btn-success">Créer une ordonnance</a>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'medical_record_list' %}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

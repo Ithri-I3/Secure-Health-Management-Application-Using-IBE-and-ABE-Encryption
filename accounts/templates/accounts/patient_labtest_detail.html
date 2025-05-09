@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails de l'analyse</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Informations générales</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Type d'analyse:</strong> {{ lab_test.get_test_type_display }}</p>
+                    <p><strong>Demandée par:</strong> {{ lab_test.requested_by.get_full_name|default:lab_test.requested_by.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date de demande:</strong> {{ lab_test.request_date|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Statut:</strong> 
+                        <span class="badge {% if lab_test.status == 'PENDING' %}bg-warning{% elif lab_test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                            {{ lab_test.get_status_display }}
+                        </span>
+                    </p>
+                    {% if lab_test.completion_date %}
+                        <p><strong>Date de complétion:</strong> {{ lab_test.completion_date|date:"d/m/Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">Description de l'analyse</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ lab_test.description|linebreaks }}</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Résultats de l'analyse</h5>
+        </div>
+        <div class="card-body">
+            {% if lab_test.abe_policy %}
+                <div class="alert alert-info mb-3">
+                    <p><strong>Politique de contrôle d'accès:</strong> {{ lab_test.abe_policy }}</p>
+                </div>
+            {% endif %}
+            {% if lab_test.encrypted_results %}
+                {% if decrypted_results %}
+                    <div class="alert alert-success">
+                        <h6>Résultats:</h6>
+                        <pre class="mt-3">{{ decrypted_results }}</pre>
+                    </div>
+                {% elif decryption_error %}
+                    <div class="alert alert-danger">
+                        <p>Erreur lors du déchiffrement: {{ decryption_error }}</p>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p>Les résultats sont chiffrés et ne peuvent pas être affichés.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-warning">
+                    <p>Aucun résultat n'a encore été enregistré pour cette analyse.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'patient_labtest_list' %}" class="btn btn-secondary">Retour à mes analyses</a>
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-primary">Retour au tableau de bord</a>
+    </div>
+</div>
+{% endblock %}

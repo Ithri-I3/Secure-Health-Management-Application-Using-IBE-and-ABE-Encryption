@@ -1,0 +1,10 @@
+[project]
+name = "medical-center"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "charm-crypto",
+    "panda>=0.3.1",
+]

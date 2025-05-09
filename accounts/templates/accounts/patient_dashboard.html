@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Tableau de bord patient</h2>
+    
+    {% if recent_completed_tests %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <h5 class="alert-heading"><i class="bi bi-bell"></i> Nouveaux résultats disponibles!</h5>
+        <p>Vos résultats d'analyses sont disponibles:</p>
+        <ul>
+            {% for test in recent_completed_tests %}
+            <li>
+                <strong>{{ test.get_test_type_display }}</strong> - Complété le {{ test.completion_date|date:"d/m/Y" }}
+                <a href="{% url 'patient_labtest_detail' test.id %}" class="btn btn-sm btn-success ms-2">Voir les résultats</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <!-- Profil patient -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Mon profil</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Informations personnelles</h6>
+                    <p><strong>Nom :</strong> {{ user.last_name }}</p>
+                    <p><strong>Prénom :</strong> {{ user.first_name }}</p>
+                    <p><strong>Email :</strong> {{ user.email }}</p>
+                    
+                    {% if profile %}
+                    <h6 class="mt-3">Informations médicales</h6>
+                    <p><strong>Date de naissance :</strong> {{ profile.date_of_birth|date:"d/m/Y" }}</p>
+                    <p><strong>Groupe sanguin :</strong> {{ profile.blood_type }}</p>
+                    {% if insurance_number_decrypted %}
+                    <p><strong>Numéro d'assurance :</strong> {{ insurance_number_decrypted }}</p>
+                    {% endif %}
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'user_detail' user.id %}" class="btn btn-outline-primary">Voir mon profil complet</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dossier médical -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-info">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Mon dossier médical</h5>
+                    <span class="badge bg-light text-info">{{ medical_records_count }} document(s)</span>
+                </div>
+                <div class="card-body">
+                    {% if medical_records %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Créé par</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in medical_records %}
+                                <tr>
+                                    <td>{{ record.creation_date|date:"d/m/Y" }}</td>
+                                    <td>{{ record.creator.get_full_name }}</td>
+                                    <td>
+                                        <a href="{% url 'medical_record_detail' record.id %}" class="btn btn-sm btn-info">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">Aucun dossier médical disponible.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Ordonnances -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Mes ordonnances</h5>
+                    <span class="badge bg-light text-success">{{ prescriptions_count }} ordonnance(s)</span>
+                </div>
+                <div class="card-body">
+                    {% if prescriptions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Validité</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>{{ prescription.issue_date|date:"d/m/Y" }}</td>
+                                    <td>{{ prescription.validity_days }} jours</td>
+                                    <td>
+                                        <a href="{% url 'prescription_detail' prescription.id %}" class="btn btn-sm btn-success">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">Aucune ordonnance disponible.</div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="{% url 'patient_prescriptions' %}" class="btn btn-outline-success">Voir toutes mes ordonnances</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analyses -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Mes analyses</h5>
+                    <span class="badge bg-light text-warning">{{ lab_tests_count }} analyse(s)</span>
+                </div>
+                <div class="card-body">
+                    {% if lab_tests %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for test in lab_tests %}
+                                <tr>
+                                    <td>{{ test.get_test_type_display }}</td>
+                                    <td>{{ test.request_date|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                            {{ test.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'patient_labtest_detail' test.id %}" class="btn btn-sm btn-warning">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">Aucune analyse disponible.</div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="{% url 'patient_labtest_request' %}" class="btn btn-warning">Demander une analyse</a>
+                        <a href="{% url 'patient_labtest_list' %}" class="btn btn-outline-warning">Voir toutes mes analyses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Examens radiologiques -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card h-100 border-danger">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Mes examens radiologiques</h5>
+                    <span class="badge bg-light text-danger">{{ radio_exams_count }} examen(s)</span>
+                </div>
+                <div class="card-body">
+                    {% if radio_exams %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Radiologue</th>
+                                    <th>Raison</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in radio_exams %}
+                                <tr>
+                                    <td>{{ exam.date|date:"d/m/Y" }}</td>
+                                    <td>{{ exam.professional.get_full_name }}</td>
+                                    <td>{{ exam.reason }}</td>
+                                    <td>
+                                        <a href="{% url 'patient_radioexam_detail' exam.id %}" class="btn btn-sm btn-danger">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">Aucun examen radiologique disponible.</div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="{% url 'patient_radioexam_list' %}" class="btn btn-outline-danger">Voir tous mes examens radiologiques</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+{% endblock %}

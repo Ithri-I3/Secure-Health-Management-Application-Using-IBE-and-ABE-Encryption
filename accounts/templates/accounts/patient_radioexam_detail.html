@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails de mon examen radiologique</h2>
+    
+    <!-- Informations de l'examen -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informations générales</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Date de l'examen:</strong> {{ radio_exam.date|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Raison de l'examen:</strong> {{ radio_exam.reason }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Radiologue:</strong> {{ radio_exam.professional.get_full_name }}</p>
+                    <p><strong>Suivi nécessaire:</strong> 
+                        {% if radio_exam.follow_up_required %}
+                            <span class="badge bg-warning">Oui</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Non</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Résultats et observations -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Résultats et observations</h5>
+        </div>
+        <div class="card-body">
+            {% if decryption_error %}
+                <div class="alert alert-danger">
+                    <strong>Erreur de déchiffrement:</strong> {{ decryption_error }}
+                </div>
+            {% elif decrypted_notes %}
+                <div class="p-3 bg-light rounded">
+                    <h6>Notes du radiologue:</h6>
+                    <div class="mt-2">
+                        {{ decrypted_notes|linebreaks }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucune note disponible ou vous n'avez pas les droits pour les déchiffrer.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Boutons d'action -->
+    <div class="mt-3 d-flex gap-2">
+        <a href="{% url 'patient_radioexam_list' %}" class="btn btn-secondary">Retour à la liste</a>
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-primary">Retour au tableau de bord</a>
+    </div>
+</div>
+{% endblock %}

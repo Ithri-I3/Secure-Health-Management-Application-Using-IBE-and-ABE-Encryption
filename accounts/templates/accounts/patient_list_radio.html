@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Liste des patients - Radiologie</h2>
+    
+    <!-- Recherche -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="search_query" name="search_query" value="{{ search_query }}" placeholder="Rechercher par nom, prénom ou email">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des patients -->
+    <div class="card">
+        <div class="card-body">
+            {% if patients %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                                <tr>
+                                    <td>{{ patient.last_name }}</td>
+                                    <td>{{ patient.first_name }}</td>
+                                    <td>{{ patient.email }}</td>
+                                    <td>
+                                        <a href="{% url 'patient_detail_radio' patient.id %}" class="btn btn-sm btn-info">Détails</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Aucun patient trouvé.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

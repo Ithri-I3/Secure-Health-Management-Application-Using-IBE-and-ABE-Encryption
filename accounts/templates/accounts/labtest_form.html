@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Demander une nouvelle analyse</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_patient" class="form-label">{{ form.patient.label }}</label>
+                    {{ form.patient }}
+                    {% if form.patient.help_text %}
+                        <div class="form-text">{{ form.patient.help_text }}</div>
+                    {% endif %}
+                    {% if form.patient.errors %}
+                        <div class="invalid-feedback d-block">{{ form.patient.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_test_type" class="form-label">{{ form.test_type.label }}</label>
+                    {{ form.test_type }}
+                    {% if form.test_type.help_text %}
+                        <div class="form-text">{{ form.test_type.help_text }}</div>
+                    {% endif %}
+                    {% if form.test_type.errors %}
+                        <div class="invalid-feedback d-block">{{ form.test_type.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">{{ form.description.label }}</label>
+                    {{ form.description }}
+                    {% if form.description.help_text %}
+                        <div class="form-text">{{ form.description.help_text }}</div>
+                    {% endif %}
+                    {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Demander l'analyse</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Détails de la Consultation</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Patient :</strong> {{ consultation.patient.user.get_full_name|default:consultation.patient.user.email }}</p>
+                    <p><strong>Date de naissance :</strong> {{ consultation.patient.date_of_birth|date:"d/m/Y" }}</p>
+                    <p><strong>Groupe sanguin :</strong> {{ consultation.patient.blood_type }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Professionnel :</strong> {{ consultation.professional.get_full_name|default:consultation.professional.email }}</p>
+                    <p><strong>Date de consultation :</strong> {{ consultation.date|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Suivi requis :</strong> {% if consultation.follow_up_required %}Oui{% else %}Non{% endif %}</p>
+                    <p><strong>Politique ABE :</strong> {{ consultation.abe_policy }}</p>
+                </div>
+            </div>
+
+            <h3>Notes de consultation</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if decrypted_notes %}
+                        <div class="consultation-notes">
+                            {{ decrypted_notes|linebreaks }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            Vous n'avez pas les autorisations nécessaires pour déchiffrer ces notes ou une erreur s'est produite lors du déchiffrement.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3>Ordonnances associées</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if prescriptions %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date d'émission</th>
+                                    <th>Validité</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>{{ prescription.issue_date|date:"d/m/Y" }}</td>
+                                    <td>{{ prescription.validity_days }} jours</td>
+                                    <td>
+                                        <a href="{% url 'prescription_detail' prescription.id %}" class="btn btn-sm btn-primary">Voir</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Aucune ordonnance associée à cette consultation</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    {% if request.user.is_admin or request.user == consultation.professional %}
+                    <a href="{% url 'consultation_update' consultation.id %}" class="btn btn-primary">Modifier</a>
+                    {% endif %}
+                    
+                    {% if request.user.is_medecin or request.user.is_praticien %}
+                    <a href="{% url 'prescription_create' %}?consultation_id={{ consultation.id }}" class="btn btn-success">Créer une ordonnance</a>
+                    {% endif %}
+                </div>
+                
+                <a href="javascript:history.back()" class="btn btn-secondary">Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

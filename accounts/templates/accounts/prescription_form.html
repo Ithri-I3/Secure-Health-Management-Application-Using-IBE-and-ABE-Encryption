@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>{% if object %}Modifier{% else %}Créer{% endif %} une Ordonnance</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.patient.id_for_label }}">Patient</label>
+                    {{ form.patient }}
+                    {{ form.patient.errors }}
+                    <small class="form-text text-muted">Sélectionnez un patient si vous n'utilisez pas une consultation existante</small>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.consultation.id_for_label }}">Consultation (optionnel)</label>
+                    {{ form.consultation }}
+                    {{ form.consultation.errors }}
+                    <small class="form-text text-muted">Vous pouvez sélectionner une consultation existante ou laisser vide pour en créer une nouvelle</small>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.content.id_for_label }}">Contenu de l'ordonnance</label>
+                    {{ form.content }}
+                    {{ form.content.errors }}
+                    <small class="form-text text-muted">{{ form.content.help_text }}</small>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.abe_policy.id_for_label }}">Politique ABE</label>
+                    {{ form.abe_policy }}
+                    {{ form.abe_policy.errors }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.validity_days.id_for_label }}">Validité (jours)</label>
+                    {{ form.validity_days }}
+                    {{ form.validity_days.errors }}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <a href="{% url 'prescription_list' %}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

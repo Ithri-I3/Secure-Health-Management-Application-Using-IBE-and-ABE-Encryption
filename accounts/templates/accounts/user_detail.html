@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                {% if user_object.is_patient %}
+                    Patient : {{ user_object.get_full_name|default:user_object.email }}
+                {% elif user_object.is_medecin %}
+                    Dr. {{ user_object.get_full_name|default:user_object.email }}
+                {% else %}
+                    {{ user_object.get_full_name|default:user_object.email }} ({{ user_object.get_role_display }})
+                {% endif %}
+            </h2>
+        </div>
+        <div class="card-body">
+            <h3>Informations générales</h3>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Email :</strong> {{ user_object.email }}</p>
+                    <p><strong>Nom :</strong> {{ user_object.last_name|default:"Non spécifié" }}</p>
+                    <p><strong>Prénom :</strong> {{ user_object.first_name|default:"Non spécifié" }}</p>
+                    <p><strong>Rôle :</strong> {{ user_object.get_role_display }}</p>
+                    <p><strong>Créé par :</strong> {{ user_object.created_by.email|default:"N/A" }}</p>
+                    
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date de création :</strong> {{ user_object.date_joined|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Dernière connexion :</strong> {{ user_object.last_login|date:"d/m/Y H:i"|default:"Jamais connecté" }}</p>
+                    {% if request.user.is_admin %}
+                    <p><strong>Statut administratif :</strong> 
+                        {% if user_object.is_active %}Actif{% else %}Inactif{% endif %} | 
+                        {% if user_object.is_staff %}Staff{% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if profile %}
+                <h3>Informations spécifiques</h3>
+                <div class="row mb-4">
+                    {% if user_object.is_patient %}
+                        <!-- Informations spécifiques au patient -->
+                        <div class="col-md-6">
+                            <p><strong>Date de naissance :</strong> {{ profile.date_of_birth|date:"d/m/Y" }}</p>
+                            <p><strong>Groupe sanguin :</strong> {{ profile.blood_type }}</p>
+                            <p><strong>Assurance :</strong> {{ insurance_number_decrypted }}</p>
+                        </div>
+                    {% elif user_object.is_medecin %}
+                        <!-- Informations spécifiques au médecin -->
+                        <div class="col-md-6">
+                            <p><strong>Spécialisation :</strong> {{ profile.specialization }}</p>
+                            <p><strong>Téléphone :</strong> {{ profile.phone_number|default:"Non spécifié" }}</p>
+                        </div>
+                    {% elif user_object.is_radiologue %}
+                        <!-- Informations spécifiques au radiologue -->
+                        <div class="col-md-6">
+                            <p><strong>Domaine :</strong> {{ profile.radiology_field }}</p>
+                            <p><strong>Téléphone :</strong> {{ profile.phone_number|default:"Non spécifié" }}</p>
+                        </div>
+                    {% elif user_object.is_laborantin %}
+                        <!-- Informations spécifiques au laborantin -->
+                        <div class="col-md-6">
+                            <p><strong>Département :</strong> {{ profile.lab_department }}</p>
+                            <p><strong>Téléphone :</strong> {{ profile.phone_number|default:"Non spécifié" }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if user_object.is_patient and medical_records %}
+                <h3>Dossiers médicaux</h3>
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date de création</th>
+                                <th>Dernière modification</th>
+                                <th>Créé par</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in medical_records %}
+                            <tr>
+                                <td>{{ record.creation_date|date:"d/m/Y H:i" }}</td>
+                                <td>{{ record.last_modified|date:"d/m/Y H:i" }}</td>
+                                <td>{{ record.creator.get_full_name|default:record.creator.email }}</td>
+                                <td>
+                                    <a href="{% url 'medical_record_detail' record.id %}" class="btn btn-sm btn-primary">Voir</a>
+                                    {% if request.user.is_admin or request.user == record.creator %}
+                                    <a href="{% url 'medical_record_update' record.id %}" class="btn btn-sm btn-secondary">Modifier</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Aucun dossier médical trouvé</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            {% if user_object.is_patient and consultations %}
+                <h3>Consultations</h3>
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Professionnel</th>
+                                <th>Suivi requis</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consultation in consultations %}
+                            <tr>
+                                <td>{{ consultation.date|date:"d/m/Y H:i" }}</td>
+                                <td>{{ consultation.professional.get_full_name|default:consultation.professional.email }}</td>
+                                <td>{% if consultation.follow_up_required %}Oui{% else %}Non{% endif %}</td>
+                                <td>
+                                    <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-primary">Voir</a>
+                                    {% if request.user == consultation.professional %}
+                                    <a href="{% url 'consultation_update' consultation.id %}" class="btn btn-sm btn-secondary">Modifier</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Aucune consultation trouvée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mt-4">
+                {% if request.user.is_admin or request.user == user_object.created_by and user_object.is_patient %}
+                <a href="{% url 'user_update' user_object.id %}" class="btn btn-primary">Modifier</a>
+                <a href="{% url 'user_delete' user_object.id %}" class="btn btn-danger">Supprimer</a>
+                {% endif %}
+                
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

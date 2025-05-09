@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mes examens radiologiques</h2>
+    
+    <!-- Filtres et recherche -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="date" class="form-label">Filtrer par date</label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des examens radiologiques -->
+    <div class="card">
+        <div class="card-body">
+            {% if radio_exams %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Radiologue</th>
+                                <th>Type d'examen</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in radio_exams %}
+                                <tr>
+                                    <td>{{ exam.date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ exam.professional.get_full_name }}</td>
+                                    <td>{{ exam.reason }}</td>
+                                    <td>
+                                        <a href="{% url 'patient_radioexam_detail' exam.id %}" class="btn btn-sm btn-info">Détails</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">Vous n'avez aucun examen radiologique.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+{% endblock %}

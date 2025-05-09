@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Détails de l'Ordonnance</h2>
+        </div>
+        <div class="card-body">
+            <h3>Informations générales</h3>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Patient :</strong> {{ prescription.consultation.patient.user.get_full_name|default:prescription.consultation.patient.user.email }}</p>
+                    <p><strong>Date de naissance :</strong> {{ prescription.consultation.patient.date_of_birth|date:"d/m/Y" }}</p>
+                    <p><strong>Groupe sanguin :</strong> {{ prescription.consultation.patient.blood_type }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Médecin :</strong> {{ prescription.consultation.professional.get_full_name|default:prescription.consultation.professional.email }}</p>
+                    <p><strong>Date d'émission :</strong> {{ prescription.issue_date|date:"d/m/Y" }}</p>
+                    <p><strong>Validité :</strong> {{ prescription.validity_days }} jours</p>
+                    <p><strong>Politique ABE :</strong> {{ prescription.abe_policy }}</p>
+                </div>
+            </div>
+
+            <h3>Contenu de l'ordonnance</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if decrypted_content %}
+                        <div class="prescription-content">
+                            {{ decrypted_content|linebreaks }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            Vous n'avez pas les autorisations nécessaires pour déchiffrer ces données ou une erreur s'est produite lors du déchiffrement.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                {% if request.user.is_admin or request.user == prescription.consultation.professional %}
+                <a href="{% url 'prescription_update' prescription.id %}" class="btn btn-primary">Modifier</a>
+                <a href="{% url 'prescription_delete' prescription.id %}" class="btn btn-danger">Supprimer</a>
+                {% endif %}
+                
+                <a href="{% url 'prescription_list' %}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
